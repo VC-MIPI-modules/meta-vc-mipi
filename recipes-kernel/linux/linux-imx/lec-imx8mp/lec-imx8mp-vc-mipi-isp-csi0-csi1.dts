@@ -1,0 +1,132 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Device Tree Source for the LEC-iMX8MP + I-Pi SMARC Plus platform
+ * connected with the Raspberry Pi Camera Module v2.1
+ *
+ * Copyright (C) 2020 ADLINK Technology Inc. All Rights Reserved.
+ */
+
+#include "lec-imx8mp.dts"
+
+/ {
+	model = "Adlink LEC-iMX8MP SOM module with VC MIPI CSI-2 camera on CSI0 and CSI1";
+};
+
+// ------------------------------------------------------------------------------------------------
+//  Supported number of lanes
+// -----+------------------------------------------------------------------------------------------
+//  1   | OV7251, IMX296, IMX297
+//  2   | OV9281, IMX264, IMX265
+//  2,4 | IMX178, IMX183, IMX226, IMX250, IMX252, IMX273, IMX290, IMX327, IMX335, IMX392,
+//      | IMX412, IMX415, IMX568
+// -----+------------------------------------------------------------------------------------------
+#define VC_MIPI_LANES       2   // 1, 2, 4 Lanes
+// ------------------------------------------------------------------------------------------------
+//   Sensor Manufacturer
+// -----+------------------------------------------------------------------------------------------
+//   1  | Sony Sensor (IMX)
+//   2  | Omni Vision Sensor (OV)
+// -----+------------------------------------------------------------------------------------------
+#define VC_MIPI_MANUFACTURER 1
+
+#if VC_MIPI_LANES == 1
+        #define CSI_LANES 1
+	#define DATA_LANES 1
+#endif
+#if VC_MIPI_LANES == 2
+        #define CSI_LANES 2
+	#define DATA_LANES 1 2
+#endif
+#if VC_MIPI_LANES == 4
+        #define CSI_LANES 4
+	#define DATA_LANES 1 2 3 4
+#endif
+
+&i2c3 {
+        /delete-node/ov5640_mipi@3c;
+
+#if VC_MIPI_MANUFACTURER == 1
+        vc_mipi@1a {
+                reg        = <0x1a>;
+#else
+        vc_mipi@60 {
+                reg        = <0x60>;
+#endif
+                compatible = "vc,vc_mipi";
+                csi_id     = <0>;
+                status     = "okay";
+
+                port {
+                        vc_mipi_ep_0: endpoint {
+                                clock-lanes      = <0>;
+                                data-lanes       = <DATA_LANES>;
+                                remote-endpoint  = <&mipi_csi0_ep>;
+                        };
+                };
+        };
+};
+
+&i2c5 {
+        /delete-node/ov13850_mipi@10;
+        /delete-node/ov13855_mipi@36;
+
+#if VC_MIPI_MANUFACTURER == 1
+        vc_mipi@1a {
+                reg        = <0x1a>;
+#else
+        vc_mipi@60 {
+                reg        = <0x60>;
+#endif
+                compatible = "vc,vc_mipi";
+                csi_id     = <1>;
+                status     = "okay";
+
+                port {
+                        vc_mipi_ep_1: endpoint {
+                                clock-lanes      = <0>;
+                                data-lanes       = <DATA_LANES>;
+                                remote-endpoint  = <&mipi_csi1_ep>;
+                        };
+                };
+        };
+};
+
+&mipi_csi0_ep {
+        remote-endpoint = <&vc_mipi_ep_0>;
+        data-lanes      = <CSI_LANES>;
+        csis-hs-settle  = <33>;
+        csis-clk-settle = <2>;
+        csis-wclk;
+};
+
+&mipi_csi1_ep {
+        remote-endpoint = <&vc_mipi_ep_1>;
+        data-lanes      = <CSI_LANES>;
+        csis-hs-settle  = <33>;
+        csis-clk-settle = <2>;
+        csis-wclk;
+};
+
+&cameradev {
+        status = "okay";
+};
+
+&isi_0 {
+        status = "disabled";
+};
+
+&isi_1 {
+        status = "disabled";
+};
+
+&isp_0 {
+        status = "okay";
+};
+
+&isp_1 {
+        status = "okay";
+};
+
+&dewarp {
+        status = "okay";
+};

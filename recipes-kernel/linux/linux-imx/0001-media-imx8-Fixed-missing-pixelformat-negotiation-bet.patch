@@ -1,0 +1,45 @@
+From 21976d14410553c335e970af48b8763598cd7809 Mon Sep 17 00:00:00 2001
+From: Peter Martienssen <peter.martienssen@liquify-consulting.de>
+Date: Fri, 5 Sep 2025 15:27:22 +0000
+Subject: [PATCH] media: imx8: Fixed missing pixelformat negotiation between
+ isi, csi and camera driver
+
+---
+ drivers/staging/media/imx/imx8-isi-cap.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-cap.c b/drivers/staging/media/imx/imx8-isi-cap.c
+index 04cbb3054e4a..2ed91aff34b4 100644
+--- a/drivers/staging/media/imx/imx8-isi-cap.c
++++ b/drivers/staging/media/imx/imx8-isi-cap.c
+@@ -700,6 +700,10 @@ static int isi_cap_fmt_init(struct mxc_isi_cap_dev *isi_cap)
+ 	struct v4l2_subdev *src_sd;
+ 	int i, ret;
+ 
++	if (dst_f->fmt != NULL && src_f->fmt != NULL) {
++		return 0;
++	}
++
+ 	src_sd = mxc_get_remote_subdev(&isi_cap->sd, __func__);
+ 	if (!src_sd) {
+ 		v4l2_err(&isi_cap->sd, "get remote subdev fail!\n");
+@@ -717,6 +721,7 @@ static int isi_cap_fmt_init(struct mxc_isi_cap_dev *isi_cap)
+ 	if (dst_f->width == 0 || dst_f->height == 0)
+ 		set_frame_bounds(dst_f, src_fmt.format.width, src_fmt.format.height);
+ 
++	dst_f->fmt = mxc_isi_find_format(NULL, &src_fmt.format.code, 0);
+ 	if (!dst_f->fmt)
+ 		dst_f->fmt = &mxc_isi_out_formats[0];
+ 
+@@ -993,7 +998,7 @@ static int mxc_isi_source_fmt_init(struct mxc_isi_cap_dev *isi_cap)
+ 
+ 	src_fmt.pad = source_pad->index;
+ 	src_fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
+-	src_fmt.format.code = MEDIA_BUS_FMT_UYVY8_1X16;
++	src_fmt.format.code = dst_f->fmt->mbus_code;
+ 	src_fmt.format.width = dst_f->width;
+ 	src_fmt.format.height = dst_f->height;
+ 	ret = v4l2_subdev_call(src_sd, pad, set_fmt, NULL, &src_fmt);
+-- 
+2.34.1
+
