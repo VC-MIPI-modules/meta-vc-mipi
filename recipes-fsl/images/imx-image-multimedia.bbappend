@@ -1,0 +1,1 @@
+IMAGE_INSTALL:append = " libubootenv-bin fw-env v4l-utils v4l2-test test.sh"
