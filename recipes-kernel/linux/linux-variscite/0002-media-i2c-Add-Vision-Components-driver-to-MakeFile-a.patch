@@ -1,0 +1,53 @@
+From 06ceffc11fbb09f24159ab6518884fb869ef6d18 Mon Sep 17 00:00:00 2001
+From: Peter Martienssen <peter.martienssen@liquify-consulting.de>
+Date: Tue, 13 Jan 2026 15:27:04 +0000
+Subject: [PATCH 2/2] media: i2c: Add Vision Components driver to MakeFile and
+ Kconfig
+Upstream-Status: Inappropriate
+---
+ drivers/media/i2c/Kconfig  | 8 ++++++++
+ drivers/media/i2c/Makefile | 2 ++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/drivers/media/i2c/Kconfig b/drivers/media/i2c/Kconfig
+index 3ca296eb056c..5b245950166a 100644
+--- a/drivers/media/i2c/Kconfig
++++ b/drivers/media/i2c/Kconfig
+@@ -649,6 +649,14 @@ config VIDEO_OV9734
+ 	  To compile this driver as a module, choose M here: the
+ 	  module's name is ov9734.
+ 
++config VIDEO_VC_MIPI
++	tristate "Vision Components UNIVERSAL sensor support"
++	depends on OF
++	depends on GPIOLIB
++	help
++	  This is a Video4Linux2 sensor driver for the Vision Components
++	  UNIVERSAL camera driver with a MIPI CSI-2 interface.
++
+ config VIDEO_AP1302
+        tristate "ON Semiconductor AP130X ISP"
+        depends on I2C && VIDEO_DEV
+diff --git a/drivers/media/i2c/Makefile b/drivers/media/i2c/Makefile
+index bb720ac476ca..48dadbacf597 100644
+--- a/drivers/media/i2c/Makefile
++++ b/drivers/media/i2c/Makefile
+@@ -1,6 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+ msp3400-objs	:=	msp3400-driver.o msp3400-kthreads.o
++vc-mipi-objs	:=	vc_mipi_camera.o vc_mipi_core.o vc_mipi_modules.o
+ 
+ obj-$(CONFIG_SDR_MAX2175) += max2175.o
+ obj-$(CONFIG_VIDEO_AD5820) += ad5820.o
+@@ -118,6 +119,7 @@ obj-$(CONFIG_VIDEO_OV9282) += ov9282.o
+ obj-$(CONFIG_VIDEO_OV9640) += ov9640.o
+ obj-$(CONFIG_VIDEO_OV9650) += ov9650.o
+ obj-$(CONFIG_VIDEO_OV9734) += ov9734.o
++obj-$(CONFIG_VIDEO_VC_MIPI) += vc-mipi.o
+ obj-$(CONFIG_VIDEO_OX03C10_LIB) += ox03c10.o
+ obj-$(CONFIG_VIDEO_OX03C10_DRV) += ox03c10_drv.o
+ obj-$(CONFIG_VIDEO_RDACM20) += rdacm20.o
+-- 
+2.34.1
+

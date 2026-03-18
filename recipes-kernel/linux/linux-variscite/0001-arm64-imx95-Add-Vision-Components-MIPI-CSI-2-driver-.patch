@@ -1,0 +1,115 @@
+From e57fd9dd8d79e8f36e7c60d4c01ae7fdd7de1437 Mon Sep 17 00:00:00 2001
+From: Peter Martienssen <peter.martienssen@liquify-consulting.de>
+Date: Tue, 13 Jan 2026 15:26:23 +0000
+Subject: [PATCH 1/2] arm64: imx95: Add Vision Components MIPI CSI-2 driver to
+ device tree
+Upstream-Status: Inappropriate
+---
+ .../dts/freescale/imx95-var-dart-sonata.dts   | 68 +++++++++----------
+ 1 file changed, 31 insertions(+), 37 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx95-var-dart-sonata.dts b/arch/arm64/boot/dts/freescale/imx95-var-dart-sonata.dts
+index 26eeb7ba8324..b8ddf4633bb9 100644
+--- a/arch/arm64/boot/dts/freescale/imx95-var-dart-sonata.dts
++++ b/arch/arm64/boot/dts/freescale/imx95-var-dart-sonata.dts
+@@ -318,24 +318,19 @@ &lpi2c3 {
+ 	sda-gpios = <&gpio2 29 GPIO_ACTIVE_HIGH>;
+ 	status = "okay";
+ 
+-	ov5640_mipi0: ov5640_mipi0@3c {
+-		compatible = "ovti,ov5640";
+-		reg = <0x3c>;
+-		clocks = <&clk_ov5640_fixed>;
+-		clock-names = "xclk";
+-		assigned-clock-rates = <24000000>;
+-		powerdown-gpios = <&pca6408_1 3 GPIO_ACTIVE_HIGH>;
+-		reset-gpios = <&pca6408_1 1 GPIO_ACTIVE_LOW>;
+-		status = "okay";
+-
+-		port {
+-			ov5640_mipi_0_ep: endpoint {
+-				remote-endpoint = <&mipi_csi0_ep>;
+-				data-lanes = <1 2>;
+-				clock-lanes = <0>;
+-			};
+-		};
+-	};
++        vc_mipi@1a {
++                reg        = <0x1a>;
++                compatible = "vc,vc_mipi";
++                status     = "okay";
++
++                port {
++                        vc_mipi_ep_0: endpoint {
++                                clock-lanes      = <0>;
++                                data-lanes       = <1 2>;
++                                remote-endpoint  = <&mipi_csi0_ep>;
++                        };
++                };
++        };
+ 
+ 	/* DS1337 RTC module */
+ 	rtc@68 {
+@@ -441,25 +436,24 @@ &lpi2c4 {
+ };
+ 
+ &lpi2c8 {
+-	ov5640_mipi1: ov5640_mipi1@3c {
+-		compatible = "ovti,ov5640";
+-		reg = <0x3c>;
+-		clocks = <&clk_ov5640_fixed>;
+-		clock-names = "xclk";
+-		assigned-clock-rates = <24000000>;
+-		powerdown-gpios = <&pca6408_1 2 GPIO_ACTIVE_HIGH>;
+-		reset-gpios = <&pca6408_1 0 GPIO_ACTIVE_LOW>;
+-		status = "okay";
+-
+-		port {
+-			ov5640_mipi_1_ep: endpoint {
+-				remote-endpoint = <&mipi_csi1_ep>;
+-				data-lanes = <1 2>;
+-				clock-lanes = <0>;
+-			};
+-		};
++	wm8904: codec@1a {
++		status = "disable";
+ 	};
+ 
++        vc_mipi@1a {
++                reg        = <0x1a>;
++                compatible = "vc,vc_mipi";
++                status     = "okay";
++
++                port {
++                        vc_mipi_ep_1: endpoint {
++                                clock-lanes      = <0>;
++                                data-lanes       = <1 2>;
++                                remote-endpoint  = <&mipi_csi1_ep>;
++                        };
++                };
++        };
++
+ 	pca6408_1: gpio@20 {
+ 		compatible = "nxp,pcal6408";
+ 		standard-regs-fallback;
+@@ -560,7 +554,7 @@ ports {
+ 		port@0 {
+ 			reg = <0>;
+ 			mipi_csi0_ep: endpoint {
+-				remote-endpoint = <&ov5640_mipi_0_ep>;
++				remote-endpoint = <&vc_mipi_ep_0>;
+ 				data-lanes = <1 2>;
+ 				clock-lanes = <0>;
+ 			};
+@@ -585,7 +579,7 @@ ports {
+ 		port@0 {
+ 			reg = <0>;
+ 			mipi_csi1_ep: endpoint {
+-				remote-endpoint = <&ov5640_mipi_1_ep>;
++				remote-endpoint = <&vc_mipi_ep_1>;
+ 				data-lanes = <1 2>;
+ 				clock-lanes = <0>;
+ 			};
+-- 
+2.34.1
+
