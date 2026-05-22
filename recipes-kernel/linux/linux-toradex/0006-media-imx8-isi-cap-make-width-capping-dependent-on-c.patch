@@ -1,0 +1,69 @@
+From e40421e080df7d7cb4a1858c2b836d4fb4254823 Mon Sep 17 00:00:00 2001
+From: Peter Martienssen <peter.martienssen@liquify-consulting.de>
+Date: Fri, 22 May 2026 11:58:40 +0000
+Subject: [PATCH 6/6] media: imx8-isi-cap: make width capping dependent on
+ channel bypass setting
+
+---
+ drivers/staging/media/imx/imx8-isi-cap.c | 38 ++++++++++++++++++------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-cap.c b/drivers/staging/media/imx/imx8-isi-cap.c
+index da4a5f0b6cc9..cb5b1a731d10 100644
+--- a/drivers/staging/media/imx/imx8-isi-cap.c
++++ b/drivers/staging/media/imx/imx8-isi-cap.c
+@@ -955,6 +955,8 @@ static int mxc_isi_cap_try_fmt_mplane(struct file *file, void *fh,
+ 	struct mxc_isi_cap_dev *isi_cap = video_drvdata(file);
+ 	struct v4l2_pix_format_mplane *pix = &f->fmt.pix_mp;
+ 	struct mxc_isi_fmt *fmt;
++	struct mxc_isi_dev *mxc_isi = mxc_isi_get_hostdata(isi_cap->pdev);
++	unsigned int wmax, hmax;
+ 	int i;
+ 
+ 	dev_dbg(&isi_cap->pdev->dev, "%s\n", __func__);
+@@ -971,15 +973,33 @@ static int mxc_isi_cap_try_fmt_mplane(struct file *file, void *fh,
+ 	}
+ 
+ 	/*
+-	 * The bit width in CHNL_IMG_CFG[HEIGHT/WIDTH] is 13, so the maximum
+-	 * theorical value for image width/height should be 8K, but due to ISI
+-	 * line buffer size limitation, the maximum value is 4K
+-	 *
+-	 * For efficient data transmission, the minimum data width should be
+-	 * 16(128/8)
+-	 */
+-	v4l_bound_align_image(&pix->width, 16, ISI_4K, fmt->align,
+-			      &pix->height, 16, ISI_4K, 1, 0);
++	* The ISI differentiates between a processed and an unprocessed camera stream.
++	* A processed stream is one for which color space conversion or scaling needs
++	* to be performed. Color conversion and scaling are performed within the ISI
++	* processing pipeline. This processing pipeline is based on a line buffer that
++	* is limited in width to 2048. By chaining two ISI channels together the width
++	* can be increased to 4096.
++	* -> In a processed stream (CSC or scaling enabled) the image width must be limited to 4K.
++	*
++	* An unprocessed stream bypasses the processing pipeline and its line buffer.
++	* In doing so it also bypasses the 4K image width limitation. The theoretical
++	* limit that then applies to the unprocessed stream is the bit width of 13 in
++	* CHNL_IMG_CFG[HEIGHT/WIDTH], allowing width and height to be up to 8192.
++	* -> In an unprocessed stream (CSC and scaling disabled) the image width can be up to 8K.
++	*
++	* Application Note 13857 details these limits in chapter 4.2.3.
++	*
++	* For efficient data transmission, the minimum data width should be 16(128/8)
++ 	 */
++	if (!mxc_isi->cscen && !mxc_isi->scale) {
++		dev_info(&isi_cap->pdev->dev, "%s: align image to 8K max width/height\n", __func__);
++		wmax = hmax = ISI_8K;
++	}
++	else {
++		dev_info(&isi_cap->pdev->dev, "%s: align image to 4K max width/height\n", __func__);
++		wmax = hmax = ISI_4K;
++	}
++	v4l_bound_align_image(&pix->width, 16, wmax, fmt->align, &pix->height, 16, hmax, 1, 0);
+ 
+ 	pix->num_planes = fmt->memplanes;
+ 	pix->pixelformat = fmt->fourcc;
+-- 
+2.34.1
+
