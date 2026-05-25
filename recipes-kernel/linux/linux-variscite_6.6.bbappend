@@ -7,9 +7,6 @@ SRC_URI += "file://0004-media-imx8-Added-v4l2-controls-to-csis-driver-for-ad.pat
 SRC_URI += "file://0006-media-imx8-isi-cap-make-width-capping-dependent-on-c.patch"
 
 KERNEL_DEVICETREE += " \
-    freescale/imx8mp-var-dart-dt8mcustomboard-vc-mipi-isi-csi0.dtb \
-    freescale/imx8mp-var-dart-dt8mcustomboard-vc-mipi-isi-csi1.dtb \
-    freescale/imx8mp-var-dart-dt8mcustomboard-vc-mipi-isi-csi0-csi1.dtb \
-    freescale/imx8mp-var-dart-dt8mcustomboard-vc-mipi-isp-csi0.dtb \
-    freescale/imx8mp-var-dart-dt8mcustomboard-vc-mipi-isp-csi0-csi1.dtb \
+    freescale/imx8mp-var-dart-dt8mcustomboard-vc-mipi-csi0-csi1.dtb \
+    freescale/imx8mp-var-dart-dt8mcustomboard-vc-mipi-csi1.dtb \
 "
