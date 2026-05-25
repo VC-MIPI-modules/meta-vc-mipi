@@ -9,7 +9,7 @@
 #include "lec-imx8mp.dts"
 
 / {
-	model = "Adlink LEC-iMX8MP SOM module with VC MIPI CSI-2 camera on CSI0";
+	model = "Adlink LEC-iMX8MP SOM module with VC MIPI CSI-2 camera on CSI1";
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -44,6 +44,11 @@
 
 &i2c3 {
         /delete-node/ov5640_mipi@3c;
+};
+
+&i2c5 {
+        /delete-node/ov13850_mipi@10;
+        /delete-node/ov13855_mipi@36;
 
 #if VC_MIPI_MANUFACTURER == 1
         vc_mipi@1a {
@@ -53,35 +58,30 @@
                 reg        = <0x60>;
 #endif
                 compatible = "vc,vc_mipi";
-                csi_id     = <0>;
+                csi_id     = <1>;
                 status     = "okay";
 
                 port {
-                        vc_mipi_ep_0: endpoint {
+                        vc_mipi_ep_1: endpoint {
                                 clock-lanes      = <0>;
                                 data-lanes       = <DATA_LANES>;
-                                remote-endpoint  = <&mipi_csi0_ep>;
+                                remote-endpoint  = <&mipi_csi1_ep>;
                         };
                 };
         };
 };
 
-&i2c5 {
-        /delete-node/ov13850_mipi@10;
-        /delete-node/ov13855_mipi@36;
+&mipi_csi_0 {
+        status = "disabled";
+        /delete-node/port;
 };
 
-&mipi_csi0_ep {
-        remote-endpoint = <&vc_mipi_ep_0>;
+&mipi_csi1_ep {
+        remote-endpoint = <&vc_mipi_ep_1>;
         data-lanes      = <CSI_LANES>;
         csis-hs-settle  = <33>;
         csis-clk-settle = <2>;
         csis-wclk;
-};
-
-&mipi_csi_1 {
-        status = "disabled";
-        /delete-node/port@1;
 };
 
 &cameradev {
@@ -89,7 +89,8 @@
 };
 
 &isi_0 {
-        status = "disabled";
+        interface = <3 0 2>;
+        status = "okay";
 };
 
 &isi_1 {
@@ -97,13 +98,13 @@
 };
 
 &isp_0 {
-        status = "okay";
-};
-
-&isp_1 {
         status = "disabled";
 };
 
-&dewarp {
+&isp_1 {
         status = "okay";
+};
+
+&dewarp {
+        status = "disabled";
 };
