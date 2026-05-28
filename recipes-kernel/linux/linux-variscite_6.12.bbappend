@@ -2,6 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI:append = " \
     file://0001-arm64-imx95-Add-Vision-Components-MIPI-CSI-2-driver-.patch \
+    file://0001-media-nxp-Add-v4l2-controls-to-dwc-csi-driver-for-ad.patch \
     file://0002-media-i2c-Add-Vision-Components-driver-to-MakeFile-a.patch \
     file://vc-mipi.cfg \
     git://github.com/VC-MIPI-modules/vc_mipi_nxp.git;protocol=https;branch=develop;name=vc_mipi_nxp;destsuffix=vc_mipi_nxp \

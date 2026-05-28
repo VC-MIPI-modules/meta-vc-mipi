@@ -1,0 +1,87 @@
+From cfef491a57addc8d1ca9f817631b01822a98fdc6 Mon Sep 17 00:00:00 2001
+From: Peter Martienssen <peter.martienssen@liquify-consulting.de>
+Date: Thu, 28 May 2026 13:02:39 +0000
+Subject: [PATCH] media: nxp: Add v4l2 controls to dwc csi driver for advanced
+ control
+Upstream-Status: Inappropriate
+---
+ drivers/media/platform/nxp/dwc-mipi-csi2.c | 35 ++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+diff --git a/drivers/media/platform/nxp/dwc-mipi-csi2.c b/drivers/media/platform/nxp/dwc-mipi-csi2.c
+index 68be53c4d740..8978baa4d1c8 100644
+--- a/drivers/media/platform/nxp/dwc-mipi-csi2.c
++++ b/drivers/media/platform/nxp/dwc-mipi-csi2.c
+@@ -288,6 +288,11 @@
+ #define DWC_CSI2RX_MAX_PIX_WIDTH	0xffff
+ #define DWC_CSI2RX_MAX_PIX_HEIGHT	0xffff
+ 
++#define ENABLE_ADVANCED_CONTROL
++#ifdef ENABLE_ADVANCED_CONTROL
++#define V4L2_CID_CSI_LANES		(V4L2_CID_LASTP1 + 10)
++#endif
++
+ /* -----------------------------------------------------------------------------
+  * Events
+  */
+@@ -1409,6 +1414,12 @@ static inline struct dwc_csi_device *ctrl_to_csidev(struct v4l2_ctrl *ctrl)
+ 	return container_of(ctrl->handler, struct dwc_csi_device, ctrl_handler);
+ }
+ 
++#ifdef ENABLE_ADVANCED_CONTROL
++static const s64 mipi_csis_csi_lanes_menu[] = {
++	1, 2, 4
++};
++#endif
++
+ static int dwc_csi_s_ctrl(struct v4l2_ctrl *ctrl)
+ {
+ 	struct dwc_csi_device *csidev  = ctrl_to_csidev(ctrl);
+@@ -1420,6 +1431,12 @@ static int dwc_csi_s_ctrl(struct v4l2_ctrl *ctrl)
+ 		csidev->pg_pattern = ctrl->val - 1;
+ 		csidev->pg_enable = (ctrl->val) ? true : false;
+ 		break;
++#ifdef ENABLE_ADVANCED_CONTROL
++	case V4L2_CID_CSI_LANES:
++		csidev->bus.num_data_lanes = mipi_csis_csi_lanes_menu[ctrl->val];
++		dev_info(csidev->dev, "set lanes: %d\n", csidev->bus.num_data_lanes);
++		break;
++#endif
+ 	default:
+ 		ret = -EINVAL;
+ 		break;
+@@ -1432,6 +1449,20 @@ static const struct v4l2_ctrl_ops dwc_csi_ctrl_ops = {
+ 	.s_ctrl = dwc_csi_s_ctrl,
+ };
+ 
++
++#ifdef ENABLE_ADVANCED_CONTROL
++static const struct v4l2_ctrl_config ctrl_csi_lanes = {
++	.ops = &dwc_csi_ctrl_ops,
++	.id = V4L2_CID_CSI_LANES,
++	.name = "CSI Lanes",
++	.type = V4L2_CTRL_TYPE_INTEGER_MENU,
++	.flags = V4L2_CTRL_FLAG_EXECUTE_ON_WRITE,
++	.max = 2,
++	.def = 1,
++	.qmenu_int = mipi_csis_csi_lanes_menu,
++};
++#endif
++
+ static int dwc_csi_controls_init(struct dwc_csi_device *csidev)
+ {
+ 	struct v4l2_ctrl_handler *handler = &csidev->ctrl_handler;
+@@ -1447,6 +1478,10 @@ static int dwc_csi_controls_init(struct dwc_csi_device *csidev)
+ 				     ARRAY_SIZE(test_pattern_menu) - 1,
+ 				     0, 0, test_pattern_menu);
+ 
++#ifdef ENABLE_ADVANCED_CONTROL
++	v4l2_ctrl_new_custom(handler, &ctrl_csi_lanes, NULL);
++#endif
++
+ 	if (handler->error) {
+ 		ret = handler->error;
+ 		v4l2_ctrl_handler_free(handler);
+-- 
+2.34.1
+
