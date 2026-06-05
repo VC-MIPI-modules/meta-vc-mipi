@@ -53,11 +53,11 @@ index da4a5f0b6cc9..cb5b1a731d10 100644
 +	* For efficient data transmission, the minimum data width should be 16(128/8)
 + 	 */
 +	if (!mxc_isi->cscen && !mxc_isi->scale) {
-+		dev_info(&isi_cap->pdev->dev, "%s: align image to 8K max width/height\n", __func__);
++		dev_dbg(&isi_cap->pdev->dev, "%s: align image to 8K max width/height\n", __func__);
 +		wmax = hmax = ISI_8K;
 +	}
 +	else {
-+		dev_info(&isi_cap->pdev->dev, "%s: align image to 4K max width/height\n", __func__);
++		dev_dbg(&isi_cap->pdev->dev, "%s: align image to 4K max width/height\n", __func__);
 +		wmax = hmax = ISI_4K;
 +	}
 +	v4l_bound_align_image(&pix->width, 16, wmax, fmt->align, &pix->height, 16, hmax, 1, 0);
