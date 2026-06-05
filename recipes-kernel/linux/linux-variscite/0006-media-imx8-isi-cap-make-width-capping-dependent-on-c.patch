@@ -52,11 +52,11 @@ index 96c71f670add..8152489bde89 100644
 -			      &pix->height, 16, ISI_4K, 1, 0);
 -
 +	if (!mxc_isi->cscen && !mxc_isi->scale) {
-+		dev_info(&isi_cap->pdev->dev, "%s: align image to 8K max width/height\n", __func__);
++		dev_dbg(&isi_cap->pdev->dev, "%s: align image to 8K max width/height\n", __func__);
 +		wmax = hmax = ISI_8K;
 +	}
 +	else {
-+		dev_info(&isi_cap->pdev->dev, "%s: align image to 4K max width/height\n", __func__);
++		dev_dbg(&isi_cap->pdev->dev, "%s: align image to 4K max width/height\n", __func__);
 +		wmax = hmax = ISI_4K;
 +	}
 +	v4l_bound_align_image(&pix->width, 16, wmax, fmt->align, &pix->height, 16, hmax, 1, 0);
