@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ad
 SECTION = "utils"
 
 SRC_URI += "git://github.com/pmliquify/v4l2-test.git;protocol=https;branch=develop"
-SRCREV = "${AUTOREV}"
+SRCREV = "b5bcdb1ae0c02642e9c288cce9a66c83ea61e934"
 
 S = "${WORKDIR}/git"
 

@@ -7,7 +7,7 @@ SECTION = "utils"
 COMPATIBLE_MACHINE = "imx95"
 
 SRC_URI += "git://github.com/VC-MIPI-modules/vc_mipi_nxp.git;protocol=https;branch=develop"
-SRCREV = "${AUTOREV}"
+SRCREV = "2576768b52973be4105b67010350ee57e2643a4b"
 
 S = "${WORKDIR}/git"
 
