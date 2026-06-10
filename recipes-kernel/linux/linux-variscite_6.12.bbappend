@@ -9,8 +9,8 @@ SRC_URI:append = " \
     git://github.com/VC-MIPI-modules/vc_mipi_core.git;protocol=https;branch=nxp/develop;name=vc_mipi_core;destsuffix=vc_mipi_core \
 "
 
-SRCREV_vc_mipi_nxp = "${AUTOREV}"
-SRCREV_vc_mipi_core = "${AUTOREV}"
+SRCREV_vc_mipi_nxp = "2576768b52973be4105b67010350ee57e2643a4b"
+SRCREV_vc_mipi_core = "eb686ed72a4e78966ba68954fd863a50d172d654"
 SRCREV_FORMAT = "vc_mipi_nxp_vc_mipi_core"
 
 do_patch:append() {
