@@ -38,7 +38,7 @@ new file mode 100644
 index 0000000..9fe7c7e
 --- /dev/null
 +++ b/vvcam/v4l2/sensor/vc-mipi-vvcam/Makefile
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,38 @@
 +PWD := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 +
 +TARGET = vc-mipi-vvcam
@@ -48,6 +48,7 @@ index 0000000..9fe7c7e
 +
 +ccflags-y += -I$(PWD)/../../../common/
 +ccflags-y += -O2 -Werror -Wmissing-declarations -Wmissing-prototypes
++ccflags-y += -DENABLE_VVCAM
 +
 +ARCH_TYPE ?= arm64
 +ANDROID ?= no
