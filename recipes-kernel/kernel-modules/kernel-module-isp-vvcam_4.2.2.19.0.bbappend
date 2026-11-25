@@ -6,8 +6,8 @@ SRC_URI += "\
     git://github.com/VC-MIPI-modules/vc_mipi_core.git;protocol=https;branch=nxp/develop;name=vc_mipi_core;destsuffix=vc_mipi_core \
 "
 
-SRCREV_vc_mipi_nxp = "62500de066affe9299eb5a3a4737b7957960be67"
-SRCREV_vc_mipi_core = "eb686ed72a4e78966ba68954fd863a50d172d654"
+SRCREV_vc_mipi_nxp = "78ab79040206dd5f7949398aec784735e9d8dda1"
+SRCREV_vc_mipi_core = "4059458e7763f3bff9edf0889d9e2be8c41f2fe8"
 SRCREV_FORMAT = "vc_mipi_nxp_vc_mipi_core"
 
 DRV_DIR = "${S}/sensor/vc-mipi-vvcam"
